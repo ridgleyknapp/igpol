@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        .chart-container {
+            max-width: 1050px;
+            /* border: 3px solid red; */
+            margin: 0 auto;
+            /* auto centers the div */
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+
+        svg {
+            /* border: 2px solid purple; */
+            overflow: visible;
+        }
+
+
+        h1 {
+            /* border: 2px solid green; */
+            text-align:center;
+        }
+        .grid-example {
+            display: grid;
+            grid-template-columns: 500px 500px;
+            row-gap: 50px;
+            column-gap: 40px;
+            padding-left:5px;
+            padding-right:5px;
+        }
+        img {
+            width: 100%;
+        }
+
+        h2 {
+            text-align:center;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            font-size:20px;
+            font-style:oblique;
+            border:2px solid gray;
+            width:80%;
+            margin-left: auto;
+            margin-right: auto;
+            padding:5px;
+
+        }
+
+        h3{
+            text-align:center;
+            color:lightslategrey;
+            font-size:14px;
+        }
+
+        .center {
+             display: block;
+             margin-left: auto;
+            margin-right: auto;
+            width: 75%;
+}
+
+
+        .pop-up{
+           position: absolute;
+           border: 1px solid black;
+           width: 210px;
+           height: 110px;
+           background-color: white;
+           padding: 10px; 
+           font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+           font-size: 12px;
+           pointer-events: none;
+           opacity: 0;
+        }
+
+        .chart-container2 {
+            max-width: 1050px;
+            /* border: 3px solid green; */
+            margin: 0 auto;
+            /* auto centers the div */
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+
+
+    </style>
+</head>
+
+<body>
+    <div class="chart-container">
+        <h1 class="headline">
+            American Christians are everywhere, but regional differences are stark.
+        </h1>
+        <h3>According to the ASARB's <a href="https://www.thearda.com/Archive/Files/Descriptions/RCMSCY10.asp">2010 US Religion Census - Religious Congregations & Membership Study</a>, roughly half of American residents identified themselves as adhering to a specific faith. Christians made up the lions share of the faithful, at 91%, and the major denominations were heavily correlated to geography.</h3><br>
+        <br>
+        <div class="grid-example">
+            <img src="statetot2.svg" width=80%;>
+            <img src="stateleader2.svg" width=80%;>
+        </div>
+
+        <div>
+            <br><br>
+            <h2>The two largest groups – Evangelicals & Catholics – have almost inverse geographic distributions.</h2>
+            <br>
+        </div>
+
+        <div class="grid-example">
+            <div>
+            <p style="text-align:center";>% Population Identifying as Evangelical Christian <br>(33.2% of Christians)</p>
+            <img src="evan1.svg">
+            </div>
+            <div>
+            <p style="text-align:center";>% of Population Identifying as Catholic <br>(39.2% of Christians)</p>  
+            <img src="cath1.svg">
+            </div>
+        </div>
+
+        <div>
+            <br><br>
+            <h2>Mainline Protestants tend to keep to the Great Plains, upper Midwest, and northern Appalachia.</h2>
+            <br>
+            <p style="text-align:center";>% of Population Identifying as Mainline Protestant<br>(15.0% of Christians)</p>
+        </div>
+
+        <img src="main1.svg" class="center">
+        <div>
+            <br><br>
+            <h2>Two additional denominations make up non-negligible segments of American Christianity: <br> Black Protestants, and members of the Church of Latter-Day Saints, or 'Mormons'. </h2>
+            <h3>These two denominations also keep to their respective regions: the South's Black Belt and the Moutain West surrounding Utah.</h3>
+            <br>
+        </div>
+
+        <div class="grid-example">
+            <div>
+            <p style="text-align:center";>% Population Identifying as Black Protestant<br>(3.2% of Christians)</p>
+            <img src="bprt1.svg">
+            </div>
+            <div>
+            <p style="text-align:center";>% of Population Identifying as LDS/Mormon<br>(4.1% of Christians)</p>  
+            <img src="lds1.svg">
+            </div>
+            <br><br>
+        </div>
+       
+        <div class="chart-container2">
+        
+            <h2>
+                Which denominations are most popular in your county?
+            </h2>
+            <br>
+            <svg width="1050px" height="500px"></svg>
+            <object 
+            data="1fkey.svg";
+            style="width:50%";
+            class="center";
+            ></object>
+            <div class="pop-up">
+            </div>
+        </div>
+    
+        <div>
+            <br><br><br>
+            <p>Produced by Ridgley Knapp for University of Chicago Harris School for Public Policy's PPHA 30560: Data Visualization. <br> Instructor Quoctrung Bui, TA Xiaoyan Wang.</p>
+        </div>
+    
+    </div>
+ 
+
+    
+</body>
+
+
+
+
+<!-- we're using d3 version 6 (the latest version) for all out work -->
+<script src="https://d3js.org/d3.v6.min.js"></script>
+
+<!-- load topojson script -->
+<script src="https://unpkg.com/topojson@3"></script>
+
+<script>
+    console.log({ d3 })
+    console.log({ topojson })
+
+    // //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
+    Promise.all([ //waits for all the data to load, then when loaded will return it all in one array called res
+        d3.json('topo3f.json'),
+    ])
+    .then(ready)
+        .catch((err) => {
+            console.log(err);
+        });
+
+    function ready(res) {
+        console.log(res[0])
+        let raw = res[0]
+
+        let county = topojson.feature(raw, raw.objects.county);
+        let state = topojson.feature(raw, raw.objects.state);
+
+        let width = 1050;
+        let height = 500;
+
+        console.log(county, state)
+
+        let svg = d3.select("body").select("svg")
+
+        let myProjection = d3.geoAlbersUsa()
+            .fitSize([width, height], county)
+
+        //path function
+        let path = d3.geoPath()
+            .projection(myProjection)
+
+        let innerlines = topojson.mesh(raw, raw.objects.state, function (a, b) {
+            return a != b;
+        });
+
+
+        //    let county2 = county.filter(function (d){
+        //        return county.features != NaN;
+        //    })
+
+        let popup = d3.select(".pop-up");
+
+        console.log(county)
+
+        let counties = svg
+            .selectAll(".counties")
+            .data(county.features)
+            .join("path")
+            .attr("d", path)
+            .style("fill", d => {
+                return d.properties.fill
+            })
+            .style("stroke", "#000")
+            .style("stroke-width", 0.1)
+            .attr("class", function (d) { return "county p-" + d.properties.GEOID })
+
+
+        svg
+            .selectAll(".states")
+            .data(state.features)
+            .join("path")
+            .attr("d", path)
+            .style("fill", "none")
+            .style("stroke", "none")
+            .style("pointer-events", "none")
+
+
+        let states = svg
+            .append("path")
+            .attr("d", path(innerlines))
+            .style("fill", "none")
+            .style("stroke", "white")
+            .style("stroke-width", 1.5)
+            .style("pointer-events", "none")
+
+            // svg.append("text")
+            // .text("Source: ASARB's U.S. Religion Census 2010")
+            // .attr("x", 580)
+            // .attr("y", height + 75)
+            // .style("font-size", 14)
+            // .style("fill", "gray")
+
+          
+                
+           
+            counties.on("mouseover", (event, d) => {
+                console.log(event)
+
+                //let lang = "In " + d.properties.NAMELSAD + ", " + d.properties.STNAME + " there were roughly " + Math.round(d.properties.EVANRATE2010) + " white evangelical Protestants per 1000 residents in 2010."
+                if(d.properties.fill != "#eee") {
+                    var lang2 = "In " + d.properties.NAMELSAD + ", " + d.properties.STNAME + ", roughly " + Math.round(d.properties.tot*100) + "% of residents identified as religious. <br><br> The most common of the Christian faithful were " + d.properties.leader1 + "s (" + Math.round(d.properties.first)+ "% of the population), followed by " + d.properties.leader2 + "s (" + Math.round(d.properties.second)+ "%) and " + d.properties.leader3 + "s (" + Math.round(d.properties.third)+ "%)."
+                } else {
+                    var lang2 = "A data error rendered " + d.properties.NAMELSAD + ", " + d.properties.STNAME + "'s data meaningless."
+                }
+            
+
+                popup
+                    .style("left", (event.x + 20) + "px")
+                    .style("top", (event.y + 2570) + "px")
+                    .html(lang2)
+                    .style("opacity", 1)
+
+            //    counties
+            //     .style("stroke", "#333333")
+            //     .style("stroke-width", .5)
+            //     .style("fill", "#c0cad8")
+            //     .style("fill-opacity", .5)
+
+            svg.select(".p-" + d.properties.GEOID)
+                .style("stroke", "red")
+                .style("stroke-width", 2.5)
+                .style("fill", d => {
+                return d.properties.fill
+            })
+                .style("fill-opacity", 1)
+                .raise()
+
+            })
+
+            counties.on("mouseout", (event, d) => {
+
+                popup
+                    .style("opacity", 0)
+
+            counties
+                .style("fill", d => {
+                return d.properties.fill
+            })
+                .style("stroke", "#000")
+                .style("stroke-width", 0.1)
+            
+               
+
+            
+            }
+
+            )}
+
+</script>
